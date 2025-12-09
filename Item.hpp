@@ -8,22 +8,24 @@
 #include <list>
 #include <map>
 
+template< typename KeyType >
 class Item {
 
     protected:
-        int64_t m_itemID;
+        KeyType m_itemID;
+        std::string m_kind;
 
     public:
-        Item(){}
-        Item( int64_t id ) : m_itemID( id ) {}
-        int64_t getID() const             { return m_itemID; }
-        void    setID( int64_t const& id ){ m_itemID = id;   }
         virtual ~Item(){}
+        Item(){}
+        Item( KeyType id, std::string kind ) : m_itemID( id ), m_kind( kind ) {}
+        KeyType getID() const             { return m_itemID; }
+        void    setID( KeyType const& id ){ m_itemID = id;   }
+        std::string getKind() const       { return m_kind;  }
+        void        setKind( std::string const& kind ){ m_kind = kind; }
 
         // virtual public interface
         virtual void   load()   = 0;               // load item from pool to cache.
         virtual void   unload() = 0;               // unload from cache.
         virtual void * get() const = 0;            // get read-only access.
-        virtual void * serialize() = 0;            // packs the item in a byte-array so it can be returned with get().
-        virtual void   deserialize( void * ) = 0;  // unpacks whatever serialize() packs.
 };

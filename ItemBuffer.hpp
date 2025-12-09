@@ -2,7 +2,8 @@
 
 #include "Item.hpp"
 
-class ItemBuffer : public Item {
+template< typename KeyType >
+class ItemBuffer : public Item< KeyType > {
 
     private:
         void const * const m_sourceBuffer = nullptr;
@@ -10,10 +11,10 @@ class ItemBuffer : public Item {
         size_t m_size = 0;
 
     public:
-        ItemBuffer(){}
-
         ~ItemBuffer(){
+            #ifdef DEBUG_CACHES
             std::cout << "Freeing...\n";
+            #endif
             free( m_itemBuffer );
             m_itemBuffer = nullptr;
             m_size = 0;
@@ -22,9 +23,12 @@ class ItemBuffer : public Item {
         ItemBuffer( ItemBuffer const& ) = delete;
         ItemBuffer & operator=( ItemBuffer const& ) = delete;
 
-        ItemBuffer( int64_t itemID, void * sourceBuffer, size_t size ) : m_sourceBuffer( sourceBuffer ) {
+        ItemBuffer( KeyType itemID, void * sourceBuffer, size_t size ) : m_sourceBuffer( sourceBuffer ) {
+            #ifdef DEBUG_CACHES
             std::cout << "Allocating...\n";
+            #endif
             this->m_itemID = itemID;
+            this->m_kind = "ItemBuffer";
             m_size = size;
             m_itemBuffer = malloc( this->m_size );
         }
@@ -38,8 +42,4 @@ class ItemBuffer : public Item {
         }
 
         void unload() override {}
-        void * serialize() override {
-            return m_itemBuffer;
-        }
-        void   deserialize( void * ) override {}
 };

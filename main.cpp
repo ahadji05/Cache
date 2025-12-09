@@ -5,10 +5,12 @@
 #include <cassert>
 #include <chrono>
 
+using key_type = int64_t;
+
 int main() {
 try
 {
-    Pool pool;
+    Pool<key_type> pool;
 
     std::vector<int> basicData(10);
     int value = 0;
@@ -19,9 +21,9 @@ try
     }
 
     for ( int i = 0 ; i < 10 ; ++i )
-        pool.addItem( std::make_unique<ItemBuffer>( i, &basicData[i], sizeof( int ) ) );
+        pool.addItem( std::make_unique<ItemBuffer<key_type>>( i, &basicData[i], sizeof( int ) ) );
 
-    CacheLRU cache( &pool, 3 );
+    CacheLRU<key_type> cache( &pool, 3 );
 
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
     auto item = cache.getItem( 6 );
@@ -40,7 +42,12 @@ try
     std::chrono::duration<double> elapsedSeconds = endTime - startTime;
     std::cout << "Benchmark completed in " << elapsedSeconds.count() << " s" << std::endl;
 
-    std::cout << *reinterpret_cast<int*>( item->get() ) << std::endl;
+    std::cout << "kind: " << item->getKind() << std::endl;
+    if ( item->getKind() == "ItemBuffer" ) {
+        ItemBuffer<key_type> * buffer = dynamic_cast<ItemBuffer<key_type>*>( item );
+        int * data = static_cast<int*>( buffer->get() );
+        std::cout << "data: " << *data << std::endl;
+    }
 
     std::cout << cache.getCache().size() << std::endl;
     std::cout << cache.getCacheOrder().size() << std::endl;

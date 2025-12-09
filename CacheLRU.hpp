@@ -2,12 +2,13 @@
 
 #include "Cache.hpp"
 
-class CacheLRU : public Cache {
+template< typename KeyType >
+class CacheLRU : public Cache< KeyType > {
 
     private:
         // List that keeps on the one end the next item to be evicted and on the other end the most recently used.
-        std::list<Item*> _cacheOrder;
-        std::map<int64_t, std::list<Item*>::const_iterator> _itemPositions;
+        std::list<Item<KeyType>*> _cacheOrder;
+        std::map<KeyType, typename std::list<Item<KeyType>*>::const_iterator> _itemPositions;
 
         // Cache maximum size.
         size_t _cacheSizeInNumItems = 0;
@@ -16,16 +17,16 @@ class CacheLRU : public Cache {
         size_t _cacheHits = 0;
         size_t _cacheEvictions = 0;
 
-        Item * searchPool ( int64_t itemID ) override {
+        Item<KeyType> * searchPool ( KeyType itemID ) override {
             return this->m_pool->getItem( itemID );
         }
 
-        Item * searchCache ( int64_t itemID ) override {
+        Item<KeyType> * searchCache ( KeyType itemID ) override {
             #ifdef DEBUG_CACHES
             std::cout << "searching cache...\n";
             #endif
             auto it = this->_cache.find( itemID );
-            if ( it == _cache.end() ) {
+            if ( it == this->_cache.end() ) {
                 #ifdef DEBUG_CACHES
                 std::cout << "not found in cache...\n";
                 #endif
@@ -36,13 +37,13 @@ class CacheLRU : public Cache {
             return it->second;
         }
 
-        void loadItemFromPool( Item &item ) override {
-            if ( _cache.size() >= _cacheSizeInNumItems ) {
-                int64_t itemID = _cacheOrder.front()->getID();
+        void loadItemFromPool( Item<KeyType> &item ) override {
+            if ( this->_cache.size() >= _cacheSizeInNumItems ) {
+                KeyType itemID = _cacheOrder.front()->getID();
                 #ifdef DEBUG_CACHES
                 std::cout << "evicting item... " << itemID << std::endl;
                 #endif
-                _cache.erase( itemID );
+                this->_cache.erase( itemID );
                 _cacheOrder.front()->unload();
                 _cacheOrder.pop_front();
                 ++_cacheEvictions;
@@ -50,43 +51,43 @@ class CacheLRU : public Cache {
             item.load();
         }
 
-        void addItemToCache  ( Item &item ) override {
-            int64_t itemID = item.getID();
+        void addItemToCache  ( Item<KeyType> &item ) override {
+            KeyType itemID = item.getID();
             #ifdef DEBUG_CACHES
             std::cout << "adding item..." << itemID << std::endl;
             #endif
-            _cache[ itemID ] = &item;
+            this->_cache[ itemID ] = &item;
             _cacheOrder.push_back( &item );
             _itemPositions.insert( { item.getID(), std::prev( _cacheOrder.end() ) } );
         }
 
-        void touchItem ( Item & item ) override {
+        void touchItem ( Item<KeyType> & item ) override {
             #ifdef DEBUG_CACHES
             std::cout << "touching item..." << item.getID() << std::endl;
             #endif
-            std::list<Item*>::const_iterator it = _itemPositions.at( item.getID() );
+            typename std::list<Item<KeyType>*>::const_iterator it = _itemPositions.at( item.getID() );
             _cacheOrder.erase( it );
             _cacheOrder.push_back( &item );
             _itemPositions[ item.getID() ] = std::prev( _cacheOrder.end() );
         }
 
     public:
-        CacheLRU( Pool const * pool, size_t cacheSizeInNumItems ) : _cacheSizeInNumItems( cacheSizeInNumItems ) {
+        CacheLRU( Pool<KeyType> const * pool, size_t cacheSizeInNumItems ) : _cacheSizeInNumItems( cacheSizeInNumItems ) {
             this->m_pool = pool;
         }
 
-        std::list<Item*> getCacheOrder() const {
+        std::list<Item<KeyType>*> getCacheOrder() const {
             return _cacheOrder;
         }
 
-        std::map<int64_t, Item*> getCache() const {
-            return _cache;
+        std::map<KeyType, Item<KeyType>*> getCache() const {
+            return this->_cache;
         }
 
-        Item * getItem( int64_t itemID ) override {
+        Item<KeyType> * getItem( KeyType itemID ) override {
 
             // search the cache and return the item if it is already in.
-            Item * item = searchCache( itemID );
+            Item<KeyType> * item = searchCache( itemID );
             if ( item != nullptr ) {
                 ++_cacheHits;
                 return item;
