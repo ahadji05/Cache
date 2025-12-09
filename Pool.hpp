@@ -4,11 +4,18 @@
 #include <memory>
 #include <map>
 
-template< typename KeyType >
+template<
+        typename KeyType = int64_t ,
+        template <typename... Args> class MapType = std::map
+        >
 class Pool {
 
     private:
-        std::map<KeyType, std::unique_ptr<Item<KeyType>>> m_pool;
+        using item_type       = Item< KeyType >;
+        using unique_ptr_type = std::unique_ptr< item_type >;
+        using pair_type       = std::pair< KeyType, unique_ptr_type >;
+
+        MapType< KeyType, unique_ptr_type > m_pool;
 
     public:
         Pool(){}
@@ -18,18 +25,18 @@ class Pool {
             return m_pool.size();
         }
 
-        void addItem( std::unique_ptr<Item<KeyType>> item ){
+        void addItem( unique_ptr_type item ){
             KeyType id = item->getID();
 
             if ( m_pool.count( id ) )
                 throw std::runtime_error( "The item with ID "+std::to_string(id)+" already exists in the pool!" );
 
-            std::pair<KeyType, std::unique_ptr<Item<KeyType>>> p = { id, std::move( item ) };
+            pair_type p = { id, std::move( item ) };
 
             m_pool.insert( std::move( p ) );
         }
 
-        Item<KeyType> * getItem( KeyType id ) const {
+        item_type * getItem( KeyType id ) const {
             if ( !m_pool.count( id ) ) {
                 #ifdef DEBUG_CACHES
                 std::cout << "not found in pool...\n";

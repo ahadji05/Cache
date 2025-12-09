@@ -2,13 +2,20 @@
 
 #include "Cache.hpp"
 
-template< typename KeyType >
-class CacheLRU : public Cache< KeyType > {
+template<
+        typename KeyType = int64_t ,
+        template <typename... Args> typename MapType = std::map
+        >
+class CacheLRU : public Cache< KeyType, MapType > {
 
     private:
+        using item_type          = Item< KeyType >;
+        using list_type          = std::list< item_type* >;
+        using list_iterator_type = typename list_type::const_iterator;
+
         // List that keeps on the one end the next item to be evicted and on the other end the most recently used.
-        std::list<Item<KeyType>*> _cacheOrder;
-        std::map<KeyType, typename std::list<Item<KeyType>*>::const_iterator> _itemPositions;
+        list_type                              _cacheOrder;
+        MapType< KeyType, list_iterator_type > _itemPositions;
 
         // Cache maximum size.
         size_t _cacheSizeInNumItems = 0;
@@ -17,11 +24,11 @@ class CacheLRU : public Cache< KeyType > {
         size_t _cacheHits = 0;
         size_t _cacheEvictions = 0;
 
-        Item<KeyType> * searchPool ( KeyType itemID ) override {
+        item_type * searchPool ( KeyType itemID ) override {
             return this->m_pool->getItem( itemID );
         }
 
-        Item<KeyType> * searchCache ( KeyType itemID ) override {
+        item_type * searchCache ( KeyType itemID ) override {
             #ifdef DEBUG_CACHES
             std::cout << "searching cache...\n";
             #endif
@@ -37,7 +44,7 @@ class CacheLRU : public Cache< KeyType > {
             return it->second;
         }
 
-        void loadItemFromPool( Item<KeyType> &item ) override {
+        void loadItemFromPool( item_type &item ) override {
             if ( this->_cache.size() >= _cacheSizeInNumItems ) {
                 KeyType itemID = _cacheOrder.front()->getID();
                 #ifdef DEBUG_CACHES
@@ -51,7 +58,7 @@ class CacheLRU : public Cache< KeyType > {
             item.load();
         }
 
-        void addItemToCache  ( Item<KeyType> &item ) override {
+        void addItemToCache  ( item_type &item ) override {
             KeyType itemID = item.getID();
             #ifdef DEBUG_CACHES
             std::cout << "adding item..." << itemID << std::endl;
@@ -61,33 +68,33 @@ class CacheLRU : public Cache< KeyType > {
             _itemPositions.insert( { item.getID(), std::prev( _cacheOrder.end() ) } );
         }
 
-        void touchItem ( Item<KeyType> & item ) override {
+        void touchItem ( item_type & item ) override {
             #ifdef DEBUG_CACHES
             std::cout << "touching item..." << item.getID() << std::endl;
             #endif
-            typename std::list<Item<KeyType>*>::const_iterator it = _itemPositions.at( item.getID() );
+            list_iterator_type it = _itemPositions.at( item.getID() );
             _cacheOrder.erase( it );
             _cacheOrder.push_back( &item );
             _itemPositions[ item.getID() ] = std::prev( _cacheOrder.end() );
         }
 
     public:
-        CacheLRU( Pool<KeyType> const * pool, size_t cacheSizeInNumItems ) : _cacheSizeInNumItems( cacheSizeInNumItems ) {
+        CacheLRU( Pool< KeyType, MapType > const * pool, size_t cacheSizeInNumItems ) : _cacheSizeInNumItems( cacheSizeInNumItems ) {
             this->m_pool = pool;
         }
 
-        std::list<Item<KeyType>*> getCacheOrder() const {
+        list_type getCacheOrder() const {
             return _cacheOrder;
         }
 
-        std::map<KeyType, Item<KeyType>*> getCache() const {
+        MapType< KeyType, item_type* > getCache() const {
             return this->_cache;
         }
 
-        Item<KeyType> * getItem( KeyType itemID ) override {
+        item_type * getItem( KeyType itemID ) override {
 
             // search the cache and return the item if it is already in.
-            Item<KeyType> * item = searchCache( itemID );
+            item_type * item = searchCache( itemID );
             if ( item != nullptr ) {
                 ++_cacheHits;
                 return item;
