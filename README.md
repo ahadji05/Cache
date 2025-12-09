@@ -15,3 +15,26 @@ Each Item specilization should provide enough information in the
 object so that the overiden load() function can load the data in the 
 cache.
 
+The following Cache methods should not be virtual, they
+should insteade be implemented in the Base class so that
+not derived class will have to reimplement them.
+
+Item * searchPool      ( int64_t itemID );
+        
+Item * searchCache     ( int64_t itemID );
+
+The methods:
+
+void loadItemFromPool( Item & item );
+
+void addItemToCache( Item & item );
+
+void touchItem( Item & item );
+
+should be normal functiona implemented in the body
+of each derived class.
+
+The only virtual method in a Cache subclass should be 
+Item * getItem( int64_t itemID ) = 0;
+
+
