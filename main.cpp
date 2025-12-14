@@ -17,11 +17,27 @@ template<
         >
 using map_type = std::unordered_map< Key, Value, Hash, Pred >;
 
+int testLRUCache( Pool<key_type, map_type> *const pool );
+
 int main() {
-try
-{
-    Pool<key_type, map_type> pool;
-    CacheLRU<key_type, map_type> cache( &pool, 3 );
+    try
+    {
+        Pool<key_type, map_type> pool;
+        testLRUCache( &pool );
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    return 0;
+}
+
+int testLRUCache( Pool<key_type, map_type> *const pool ) {
+
+    CacheLRU<key_type, map_type> cache( pool, 3 );
+    assert( cache.getCacheSizeInNumItems() == 3 );
+    assert( cache.getPool() == pool );
+    assert( cache.getCache().size() == 0 );
 
     // Populate the pool with some items.
     std::vector<int> basicData(10);
@@ -32,8 +48,7 @@ try
         value = 2 * value + 1;
     }
     for ( int i = 0 ; i < 10 ; ++i )
-        pool.addItem( std::make_unique<item_type>( i, &basicData[i], sizeof( int ) ) );
-
+        pool->addItem( std::make_unique<item_type>( i, &basicData[i], sizeof( int ) ) );
 
     // Benchmark cache performance by accessing some items.
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
@@ -62,10 +77,6 @@ try
 
     std::cout << cache.getCache().size() << std::endl;
     std::cout << cache.getCacheOrder().size() << std::endl;
-}
-catch(const std::exception& e)
-{
-    std::cerr << e.what() << '\n';
-}
+
     return 0;
 }

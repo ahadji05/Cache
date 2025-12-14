@@ -17,13 +17,6 @@ class CacheLRU : public Cache< KeyType, MapType > {
         list_type                              _cacheOrder;
         MapType< KeyType, list_iterator_type > _itemPositions;
 
-        // Cache maximum size.
-        size_t _cacheSizeInNumItems = 0;
-
-        // Keep track of the number of cache hits.
-        size_t _cacheHits = 0;
-        size_t _cacheEvictions = 0;
-
         item_type * searchPool ( KeyType itemID ) override {
             return this->m_pool->getItem( itemID );
         }
@@ -45,7 +38,7 @@ class CacheLRU : public Cache< KeyType, MapType > {
         }
 
         void loadItemFromPool( item_type &item ) override {
-            if ( this->_cache.size() >= _cacheSizeInNumItems ) {
+            if ( this->_cache.size() >= this->_cacheSizeInNumItems ) {
                 KeyType itemID = _cacheOrder.front()->getID();
                 #ifdef DEBUG_CACHES
                 std::cout << "evicting item... " << itemID << std::endl;
@@ -53,7 +46,12 @@ class CacheLRU : public Cache< KeyType, MapType > {
                 this->_cache.erase( itemID );
                 _cacheOrder.front()->unload();
                 _cacheOrder.pop_front();
+<<<<<<< Updated upstream
                 ++_cacheEvictions;
+=======
+                this->_cache.erase( itemID );
+                ++this->_cacheEvictions;
+>>>>>>> Stashed changes
             }
             item.load();
         }
@@ -76,11 +74,16 @@ class CacheLRU : public Cache< KeyType, MapType > {
             _cacheOrder.erase( it );
             _cacheOrder.push_back( &item );
             _itemPositions[ item.getID() ] = std::prev( _cacheOrder.end() );
+<<<<<<< Updated upstream
+=======
+            ++this->_cacheHits;
+>>>>>>> Stashed changes
         }
 
     public:
-        CacheLRU( Pool< KeyType, MapType > const * pool, size_t cacheSizeInNumItems ) : _cacheSizeInNumItems( cacheSizeInNumItems ) {
+        CacheLRU( Pool< KeyType, MapType > const * pool, size_t cacheSizeInNumItems ) {
             this->m_pool = pool;
+            this->_cacheSizeInNumItems = cacheSizeInNumItems;
         }
 
         list_type getCacheOrder() const {
@@ -100,11 +103,12 @@ class CacheLRU : public Cache< KeyType, MapType > {
                 return item;
             }
 
-            // load from the pool.
+            // search pool for the item.
             item = searchPool( itemID );
             if ( item == nullptr )
                 throw std::runtime_error( "Not found item with ID "+std::to_string( itemID )+" in the pool!" );
 
+            // load from the pool.
             loadItemFromPool( *item );
 
             // update cache status.
