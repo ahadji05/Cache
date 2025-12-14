@@ -39,8 +39,6 @@ class CacheLRU : public Cache< KeyType, MapType > {
                 #endif
                 return nullptr;
             }
-
-            touchItem( *it->second );
             return it->second;
         }
 
@@ -50,9 +48,9 @@ class CacheLRU : public Cache< KeyType, MapType > {
                 #ifdef DEBUG_CACHES
                 std::cout << "evicting item... " << itemID << std::endl;
                 #endif
-                this->_cache.erase( itemID );
                 _cacheOrder.front()->unload();
                 _cacheOrder.pop_front();
+                this->_cache.erase( itemID );
                 ++_cacheEvictions;
             }
             item.load();
@@ -76,6 +74,7 @@ class CacheLRU : public Cache< KeyType, MapType > {
             _cacheOrder.erase( it );
             _cacheOrder.push_back( &item );
             _itemPositions[ item.getID() ] = std::prev( _cacheOrder.end() );
+            ++_cacheHits;
         }
 
     public:
@@ -96,7 +95,7 @@ class CacheLRU : public Cache< KeyType, MapType > {
             // search the cache and return the item if it is already in.
             item_type * item = searchCache( itemID );
             if ( item != nullptr ) {
-                ++_cacheHits;
+                touchItem( *item );
                 return item;
             }
 
