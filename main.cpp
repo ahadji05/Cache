@@ -189,11 +189,13 @@ int test_for_CacheLRU( Pool<key_type, map_type> *const pool ) {
     assert( cacheOrder.back()->getID() == 9 );
 
     // try to get an item that does not exist in the pool.
+    std::string errorMsg;
     try {
-        cache.getItem( 1 );
-    } catch(const std::exception& e) {
-        assert( e.what() == std::string( "Not found item with ID 1 in the pool!" ) );
+        item = cache.getItem( 11 );
+    } catch( std::exception const& e ) {
+        errorMsg = e.what();
     }
+    assert( errorMsg == "Not found item with ID 11 in the pool!" );
 
     std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsedSeconds = endTime - startTime;
