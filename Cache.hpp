@@ -11,7 +11,7 @@ class Cache {
     protected:
         using item_type = Item< KeyType >;
 
-        // Pointer to the associated pool.
+        // Pointer to the associated pool (non-owning).
         Pool<KeyType, MapType> const * m_pool;
 
         // Map of items currently in cache.
