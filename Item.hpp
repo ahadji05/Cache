@@ -12,17 +12,41 @@ template< typename KeyType >
 class Item {
 
     protected:
+
+        // ID of the item.
         KeyType m_itemID;
 
     public:
         using key_type = KeyType;
 
-        virtual ~Item(){}
-        Item(){}
-        Item( KeyType id ) : m_itemID( id ) {}
-        KeyType getID() const { return m_itemID; }
+        Item();
+        virtual ~Item() {}
 
-        // virtual public interface
-        virtual void load()   = 0; // load item from pool to cache.
+        Item( KeyType id );
+        KeyType getID() const;
+
+        virtual void load()   = 0; // load to cache.
         virtual void unload() = 0; // unload from cache.
 };
+
+
+/*********************************
+ * PUBLIC INTERFACE IMPLEMENTATION
+ ********************************/
+
+template< typename KeyType >
+Item<KeyType>::Item()
+{
+}
+
+template< typename KeyType >
+Item<KeyType>::Item( KeyType id ) : m_itemID( id )
+{
+}
+
+template< typename KeyType >
+KeyType
+Item<KeyType>::getID() const
+{
+    return m_itemID;
+}
