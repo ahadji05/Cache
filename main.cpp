@@ -80,7 +80,7 @@ int main() {
 
 int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> const& testData ) {
 
-    // create a cache with capacity of 3 items.
+    // Create a cache with capacity of 3 items.
     CacheLRU<key_type, map_type> cache( &pool, 3 );
     assert( cache.getCacheSizeInNumItems() == 3 );
     assert( cache.getPool() == &pool );
@@ -88,10 +88,7 @@ int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> co
     assert( cache.getCacheHits() == 0 );
     assert( cache.getCacheEvictions() == 0 );
 
-    // benchmark cache performance by accessing some items.
-    std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
-
-    // add new item with ID 6.
+    // Add new item with ID 6.
     auto item = cache.getItem( 6 );
     auto cacheOrder = cache.getCacheOrder();
     auto cacheMap = cache.getCache();
@@ -99,7 +96,7 @@ int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> co
     assert( cacheOrder.front()->getID() == 6 );
     assert( dynamic_cast<TestItem*>( cacheOrder.front() )->get() == testData[ 6 ] );
 
-    // add new item with ID 5.
+    // Add new item with ID 5.
     item = cache.getItem( 5 );
     cacheOrder = cache.getCacheOrder();
     cacheMap = cache.getCache();
@@ -112,7 +109,7 @@ int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> co
     assert( dynamic_cast<TestItem*>( cacheMap.at( 5 ) )->get() == testData[ 5 ] );
     assert( dynamic_cast<TestItem*>( cacheMap.at( 6 ) )->get() == testData[ 6 ] );
 
-    // add new item with ID 4.
+    // Add new item with ID 4.
     item = cache.getItem( 4 );
     cacheOrder = cache.getCacheOrder();
     cacheMap = cache.getCache();
@@ -132,7 +129,7 @@ int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> co
     assert( cache.getCacheEvictions() == 0 );
     assert( cache.getCacheHits() == 0 );
 
-    // touch item 5.
+    // Touch item 5.
     item = cache.getItem( 5 );
     cacheOrder = cache.getCacheOrder();
     cacheMap = cache.getCache();
@@ -144,7 +141,7 @@ int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> co
     assert( cacheOrder.front()->getID() == 6 );
     assert( cacheOrder.back()->getID() == 5 );
 
-    // touch item 5 (again).
+    // Touch item 5 (again).
     item = cache.getItem( 5 );
     cacheOrder = cache.getCacheOrder();
     cacheMap = cache.getCache();
@@ -156,7 +153,7 @@ int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> co
     assert( cacheOrder.front()->getID() == 6 );
     assert( cacheOrder.back()->getID() == 5 );
 
-    // touch item 4.
+    // Touch item 4.
     item = cache.getItem( 4 );
     cacheOrder = cache.getCacheOrder();
     cacheMap = cache.getCache();
@@ -168,7 +165,7 @@ int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> co
     assert( cacheOrder.front()->getID() == 6 );
     assert( cacheOrder.back()->getID() == 4 );
 
-    // add new item 7; should evict item 6.
+    // Add new item 7; should evict item 6.
     item = cache.getItem( 7 );
     cacheOrder = cache.getCacheOrder();
     cacheMap = cache.getCache();
@@ -180,7 +177,7 @@ int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> co
     assert( cacheOrder.front()->getID() == 5 );
     assert( cacheOrder.back()->getID() == 7 );
 
-    // add new item 9; should evict item 5.
+    // Add new item 9; should evict item 5.
     item = cache.getItem( 9 );
     cacheOrder = cache.getCacheOrder();
     cacheMap = cache.getCache();
@@ -192,7 +189,7 @@ int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> co
     assert( cacheOrder.front()->getID() == 4 );
     assert( cacheOrder.back()->getID() == 9 );
 
-    // try to get an item that does not exist in the pool.
+    // Try to get an item that does not exist in the pool.
     std::string errorMsg;
     try {
         item = cache.getItem( 11 );
@@ -200,10 +197,6 @@ int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> co
         errorMsg = e.what();
     }
     assert( errorMsg == "Not found item with ID 11 in the pool!" );
-
-    std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsedSeconds = endTime - startTime;
-    std::cout << "Benchmark completed in " << elapsedSeconds.count() << " s" << std::endl;
 
     return 0;
 }
