@@ -52,7 +52,6 @@ CacheLRU<KeyType, MapType>::~CacheLRU() noexcept
 {
 }
 
-
 template< typename KeyType, template <typename... Args> class MapType >
 typename CacheLRU<KeyType, MapType>::list_type
 CacheLRU<KeyType, MapType>::getCacheOrder() const
@@ -93,8 +92,6 @@ CacheLRU<KeyType, MapType>::getItem( KeyType itemID )
     return item;
 }
 
-
-
 /**********************************
  * PRIVATE INTERFACE IMPLEMENTATION
  *********************************/
@@ -113,7 +110,6 @@ CacheLRU<KeyType, MapType>::touchItem ( item_type & item )
     ++this->_cacheHits;
 }
 
-
 template< typename KeyType, template <typename... Args> class MapType >
 void
 CacheLRU<KeyType, MapType>::addItemToCache  ( item_type &item )
@@ -126,7 +122,6 @@ CacheLRU<KeyType, MapType>::addItemToCache  ( item_type &item )
     _cacheOrder.push_back( &item );
     _itemPositions.insert( { item.getID(), std::prev( _cacheOrder.end() ) } );
 }
-
 
 template< typename KeyType, template <typename... Args> class MapType >
 void
@@ -144,7 +139,6 @@ CacheLRU<KeyType, MapType>::loadItemFromPool( item_type &item )
     }
     item.load();
 }
-
 
 template< typename KeyType, template <typename... Args> class MapType >
 typename CacheLRU<KeyType, MapType>::item_type *

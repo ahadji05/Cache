@@ -37,7 +37,6 @@ class Cache {
         virtual item_type *getItem( KeyType itemID ) = 0;
 };
 
-
 /*********************************
  * PUBLIC INTERFACE IMPLEMENTATION
  ********************************/

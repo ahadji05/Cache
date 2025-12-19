@@ -72,7 +72,6 @@ CacheLFU<KeyType, MapType>::getUsageCount() const
     return _usageCount;
 }
 
-
 template< typename KeyType, template <typename... Args> class MapType >
 MapType< size_t, MapType< KeyType, typename CacheLFU<KeyType, MapType>::usageCountIterator > >
 CacheLFU<KeyType, MapType>::getFrequencyMap() const
@@ -148,7 +147,6 @@ CacheLFU<KeyType, MapType>::touchItem ( item_type & item )
     ++this->_cacheHits;
 }
 
-
 template< typename KeyType, template <typename... Args> class MapType >
 void
 CacheLFU<KeyType, MapType>::addItemToCache  ( item_type &item )
@@ -196,7 +194,6 @@ CacheLFU<KeyType, MapType>::loadItemFromPool( item_type &item )
     }
     item.load();
 }
-
 
 template< typename KeyType, template <typename... Args> class MapType >
 typename CacheLFU<KeyType, MapType>::item_type *
