@@ -7,4 +7,4 @@ A generic pool-backed cache interface.
  - First In First Out (CacheFIFO)
 
 ### Cache algorithms under development 
- - Random Replacement
+ - Random Replacement (CacheRR)
