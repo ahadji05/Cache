@@ -1,8 +1,9 @@
 
-#include "Item.hpp"
+#include "CacheFIFO.hpp"
 #include "CacheLRU.hpp"
 #include "CacheLFU.hpp"
 #include "Pool.hpp"
+#include "Item.hpp"
 #include <cassert>
 #include <chrono>
 
@@ -54,6 +55,7 @@ using map_type = std::unordered_map< Key, Value, Hash, Pred >;
 
 int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> const& testData );
 int test_for_CacheLFU( Pool<key_type, map_type> const& pool, std::vector<int> const& testData );
+int test_for_CacheFIFO( Pool<key_type, map_type> const& pool, std::vector<int> const& testData );
 
 int main() {
 
@@ -74,6 +76,8 @@ int main() {
     test_for_CacheLRU( pool, testData );
 
     test_for_CacheLFU( pool, testData );
+
+    test_for_CacheFIFO( pool, testData );
 
     return 0;
 }
@@ -344,6 +348,102 @@ int test_for_CacheLFU( Pool<key_type, map_type> const& pool, std::vector<int> co
     // Print usage count.
     for ( auto const& it : usageCount )
         std::cout << "Item ID: " << it.first->getID() << " | Usage count: " << it.second << std::endl;
+
+    return 0;
+}
+
+int test_for_CacheFIFO( Pool<key_type, map_type> const& pool, std::vector<int> const& testData )
+{
+    CacheFIFO<key_type, map_type> fifoCache( &pool, 3 );
+
+    // Add item with ID 2.
+    fifoCache.getItem( 2 );
+    auto cache = fifoCache.getCache();
+    auto cacheOrder = fifoCache.getCacheOrder();
+    assert( cache.size() == 1 );
+    assert( cache.at( 2 )->getID() == 2 );
+    assert( dynamic_cast<TestItem*>(cache.at( 2 ))->get() == testData[ 2 ] );
+    assert( cacheOrder.size() == 1 );
+    assert( cacheOrder.front() == 2 );
+
+    // Add item with ID 4.
+    fifoCache.getItem( 4 );
+    cache = fifoCache.getCache();
+    cacheOrder = fifoCache.getCacheOrder();
+    assert( cache.size() == 2 );
+    assert( cache.at( 2 )->getID() == 2 );
+    assert( dynamic_cast<TestItem*>(cache.at( 2 ))->get() == testData[ 2 ] );
+    assert( cache.at( 4 )->getID() == 4 );
+    assert( dynamic_cast<TestItem*>(cache.at( 4 ))->get() == testData[ 4 ] );
+    assert( cacheOrder.size() == 2 );
+    assert( cacheOrder.front() == 2 );
+    assert( cacheOrder.back() == 4 );
+
+    // Add item with ID 6.
+    fifoCache.getItem( 6 );
+    cache = fifoCache.getCache();
+    cacheOrder = fifoCache.getCacheOrder();
+    assert( cache.size() == 3 );
+    assert( cache.at( 2 )->getID() == 2 );
+    assert( dynamic_cast<TestItem*>(cache.at( 2 ))->get() == testData[ 2 ] );
+    assert( cache.at( 4 )->getID() == 4 );
+    assert( dynamic_cast<TestItem*>(cache.at( 4 ))->get() == testData[ 4 ] );
+    assert( cache.at( 6 )->getID() == 6 );
+    assert( dynamic_cast<TestItem*>(cache.at( 6 ))->get() == testData[ 6 ] );
+    assert( cacheOrder.size() == 3 );
+    assert( cacheOrder.front() == 2 );
+    assert( cacheOrder.back() == 6 );
+
+    // Add item with ID 8; should evict item with ID 2.
+    fifoCache.getItem( 8 );
+    cache = fifoCache.getCache();
+    cacheOrder = fifoCache.getCacheOrder();
+    assert( cache.size() == 3 );
+    assert( cache.at( 4 )->getID() == 4 );
+    assert( dynamic_cast<TestItem*>(cache.at( 4 ))->get() == testData[ 4 ] );
+    assert( cache.at( 6 )->getID() == 6 );
+    assert( dynamic_cast<TestItem*>(cache.at( 6 ))->get() == testData[ 6 ] );
+    assert( cache.at( 8 )->getID()  == 8 );
+    assert( dynamic_cast<TestItem*>(cache.at( 8 ))->get() == testData[ 8 ] );
+    assert( cacheOrder.size() == 3 );
+    assert( cacheOrder.front() == 4 );
+    assert( cacheOrder.back() == 8 );
+
+    // Add item with ID 4 (touch).
+    fifoCache.getItem( 4 );
+
+    // Add item with ID 10; should evict item with ID 4 because the order is not affected with touch.
+    fifoCache.getItem( 9 );
+    cache = fifoCache.getCache();
+    cacheOrder = fifoCache.getCacheOrder();
+    assert( cache.size() == 3 );
+    assert( cache.at( 6 )->getID() == 6 );
+    assert( dynamic_cast<TestItem*>(cache.at( 6 ))->get() == testData[ 6 ] );
+    assert( cache.at( 8 )->getID() == 8 );
+    assert( dynamic_cast<TestItem*>(cache.at( 8 ))->get() == testData[ 8 ] );
+    assert( cache.at( 9 )->getID() == 9 );
+    assert( dynamic_cast<TestItem*>(cache.at( 9 ))->get() == testData[ 9 ] );
+    assert( cacheOrder.size() == 3 );
+    assert( cacheOrder.front() == 6 );
+    assert( cacheOrder.back() == 9 );
+
+    // Try to get an item that does not exist in the pool.
+    std::string errorMsg;
+    try {
+        fifoCache.getItem( 11 );
+    } catch( std::exception const& e ) {
+        errorMsg = e.what();
+    }
+    assert( errorMsg == "Not found item with ID 11 in the pool!" );
+
+    // Check cache hits and evictions.
+    assert( fifoCache.getCacheHits() == 1 );
+    assert( fifoCache.getCacheEvictions() == 2 );
+
+    // Print usage count.
+    std::cout << "Cache order (from oldest to newest):" << std::endl;
+    for ( auto const& e : cacheOrder )
+        std::cout << "Item ID: " << e << std::endl;
 
     return 0;
 }
