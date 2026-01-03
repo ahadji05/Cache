@@ -99,6 +99,7 @@ CacheFIFO<KeyType, MapType>::touchItem ( item_type & item )
     #ifdef DEBUG_CACHES
     std::cout << "touching item..." << item.getID() << std::endl;
     #endif
+    // touch is a no-operation call for FIFO cache.
     ++this->_cacheHits;
 }
 
