@@ -7,9 +7,14 @@
 #include <cassert>
 #include <chrono>
 
+/*******************************************************************************
+ * Main test program for Cache implementations.
+ * Tests CacheLRU, CacheLFU, and CacheFIFO classes using a simple TestItem class.
+ *******************************************************************************/
+
 /**
- * A dummy item that throws an exception if accessed before being loaded.
- * Used for testing the cache and pool functionality.
+ * A simple item that throws an exception if it is accessed before it is being loaded.
+ * Used for testing the Cache functionality.
  */
 class TestItem : public Item< int64_t > {
 
@@ -85,25 +90,25 @@ int main() {
 int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> const& testData ) {
 
     // Create a cache with capacity of 3 items.
-    CacheLRU<key_type, map_type> cache( &pool, 3 );
-    assert( cache.getCacheSizeInNumItems() == 3 );
-    assert( cache.getPool() == &pool );
-    assert( cache.getCache().size() == 0 );
-    assert( cache.getCacheHits() == 0 );
-    assert( cache.getCacheEvictions() == 0 );
+    CacheLRU<key_type, map_type> lrucache( &pool, 3 );
+    assert( lrucache.getCacheSizeInNumItems() == 3 );
+    assert( lrucache.getPool() == &pool );
+    assert( lrucache.getCache().size() == 0 );
+    assert( lrucache.getCacheHits() == 0 );
+    assert( lrucache.getCacheEvictions() == 0 );
 
     // Add new item with ID 6.
-    auto item = cache.getItem( 6 );
-    auto cacheOrder = cache.getCacheOrder();
-    auto cacheMap = cache.getCache();
+    auto item = lrucache.getItem( 6 );
+    auto cacheOrder = lrucache.getCacheOrder();
+    auto cacheMap = lrucache.getCache();
     assert( cacheOrder.size() == 1 );
     assert( cacheOrder.front()->getID() == 6 );
     assert( dynamic_cast<TestItem*>( cacheOrder.front() )->get() == testData[ 6 ] );
 
     // Add new item with ID 5.
-    item = cache.getItem( 5 );
-    cacheOrder = cache.getCacheOrder();
-    cacheMap = cache.getCache();
+    item = lrucache.getItem( 5 );
+    cacheOrder = lrucache.getCacheOrder();
+    cacheMap = lrucache.getCache();
     assert( cacheMap.size() == 2 );
     assert( cacheOrder.size() == 2 );
     assert( cacheOrder.back()->getID() == 5 );
@@ -114,9 +119,9 @@ int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> co
     assert( dynamic_cast<TestItem*>( cacheMap.at( 6 ) )->get() == testData[ 6 ] );
 
     // Add new item with ID 4.
-    item = cache.getItem( 4 );
-    cacheOrder = cache.getCacheOrder();
-    cacheMap = cache.getCache();
+    item = lrucache.getItem( 4 );
+    cacheOrder = lrucache.getCacheOrder();
+    cacheMap = lrucache.getCache();
     assert( cacheMap.size() == 3 );
     assert( cacheOrder.size() == 3 );
     assert( cacheOrder.back()->getID() == 4 );
@@ -130,73 +135,73 @@ int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> co
     assert( dynamic_cast<TestItem*>( cacheMap.at( 4 ) )->get() == testData[ 4 ] );
     assert( dynamic_cast<TestItem*>( cacheMap.at( 5 ) )->get() == testData[ 5 ] );
     assert( dynamic_cast<TestItem*>( cacheMap.at( 6 ) )->get() == testData[ 6 ] );
-    assert( cache.getCacheEvictions() == 0 );
-    assert( cache.getCacheHits() == 0 );
+    assert( lrucache.getCacheEvictions() == 0 );
+    assert( lrucache.getCacheHits() == 0 );
 
     // Touch item 5.
-    item = cache.getItem( 5 );
-    cacheOrder = cache.getCacheOrder();
-    cacheMap = cache.getCache();
+    item = lrucache.getItem( 5 );
+    cacheOrder = lrucache.getCacheOrder();
+    cacheMap = lrucache.getCache();
     assert( dynamic_cast<TestItem*>( cacheMap.at( 4 ) )->get() == testData[ 4 ] );
     assert( dynamic_cast<TestItem*>( cacheMap.at( 5 ) )->get() == testData[ 5 ] );
     assert( dynamic_cast<TestItem*>( cacheMap.at( 6 ) )->get() == testData[ 6 ] );
-    assert( cache.getCacheEvictions() == 0 );
-    assert( cache.getCacheHits() == 1 );
+    assert( lrucache.getCacheEvictions() == 0 );
+    assert( lrucache.getCacheHits() == 1 );
     assert( cacheOrder.front()->getID() == 6 );
     assert( cacheOrder.back()->getID() == 5 );
 
     // Touch item 5 (again).
-    item = cache.getItem( 5 );
-    cacheOrder = cache.getCacheOrder();
-    cacheMap = cache.getCache();
+    item = lrucache.getItem( 5 );
+    cacheOrder = lrucache.getCacheOrder();
+    cacheMap = lrucache.getCache();
     assert( dynamic_cast<TestItem*>( cacheMap.at( 4 ) )->get() == testData[ 4 ] );
     assert( dynamic_cast<TestItem*>( cacheMap.at( 5 ) )->get() == testData[ 5 ] );
     assert( dynamic_cast<TestItem*>( cacheMap.at( 6 ) )->get() == testData[ 6 ] );
-    assert( cache.getCacheEvictions() == 0 );
-    assert( cache.getCacheHits() == 2 );
+    assert( lrucache.getCacheEvictions() == 0 );
+    assert( lrucache.getCacheHits() == 2 );
     assert( cacheOrder.front()->getID() == 6 );
     assert( cacheOrder.back()->getID() == 5 );
 
     // Touch item 4.
-    item = cache.getItem( 4 );
-    cacheOrder = cache.getCacheOrder();
-    cacheMap = cache.getCache();
+    item = lrucache.getItem( 4 );
+    cacheOrder = lrucache.getCacheOrder();
+    cacheMap = lrucache.getCache();
     assert( dynamic_cast<TestItem*>( cacheMap.at( 4 ) )->get() == testData[ 4 ] );
     assert( dynamic_cast<TestItem*>( cacheMap.at( 5 ) )->get() == testData[ 5 ] );
     assert( dynamic_cast<TestItem*>( cacheMap.at( 6 ) )->get() == testData[ 6 ] );
-    assert( cache.getCacheEvictions() == 0 );
-    assert( cache.getCacheHits() == 3 );
+    assert( lrucache.getCacheEvictions() == 0 );
+    assert( lrucache.getCacheHits() == 3 );
     assert( cacheOrder.front()->getID() == 6 );
     assert( cacheOrder.back()->getID() == 4 );
 
     // Add new item 7; should evict item 6.
-    item = cache.getItem( 7 );
-    cacheOrder = cache.getCacheOrder();
-    cacheMap = cache.getCache();
+    item = lrucache.getItem( 7 );
+    cacheOrder = lrucache.getCacheOrder();
+    cacheMap = lrucache.getCache();
     assert( dynamic_cast<TestItem*>( cacheMap.at( 4 ) )->get() == testData[ 4 ] );
     assert( dynamic_cast<TestItem*>( cacheMap.at( 5 ) )->get() == testData[ 5 ] );
     assert( dynamic_cast<TestItem*>( cacheMap.at( 7 ) )->get() == testData[ 7 ] );
-    assert( cache.getCacheEvictions() == 1 );
-    assert( cache.getCacheHits() == 3 );
+    assert( lrucache.getCacheEvictions() == 1 );
+    assert( lrucache.getCacheHits() == 3 );
     assert( cacheOrder.front()->getID() == 5 );
     assert( cacheOrder.back()->getID() == 7 );
 
     // Add new item 9; should evict item 5.
-    item = cache.getItem( 9 );
-    cacheOrder = cache.getCacheOrder();
-    cacheMap = cache.getCache();
+    item = lrucache.getItem( 9 );
+    cacheOrder = lrucache.getCacheOrder();
+    cacheMap = lrucache.getCache();
     assert( dynamic_cast<TestItem*>( cacheMap.at( 4 ) )->get() == testData[ 4 ] );
     assert( dynamic_cast<TestItem*>( cacheMap.at( 7 ) )->get() == testData[ 7 ] );
     assert( dynamic_cast<TestItem*>( cacheMap.at( 9 ) )->get() == testData[ 9 ] );
-    assert( cache.getCacheEvictions() == 2 );
-    assert( cache.getCacheHits() == 3 );
+    assert( lrucache.getCacheEvictions() == 2 );
+    assert( lrucache.getCacheHits() == 3 );
     assert( cacheOrder.front()->getID() == 4 );
     assert( cacheOrder.back()->getID() == 9 );
 
-    // Try to get an item that does not exist in the pool.
+    // Test exception for non-existing item with ID 11.
     std::string errorMsg;
     try {
-        item = cache.getItem( 11 );
+        item = lrucache.getItem( 11 );
     } catch( std::exception const& e ) {
         errorMsg = e.what();
     }
@@ -332,14 +337,14 @@ int test_for_CacheLFU( Pool<key_type, map_type> const& pool, std::vector<int> co
     assert( usageCount.at( cache.at( 4 ) ) == 1 );
     assert( usageCount.at( cache.at( 7 ) ) == 3 );
 
-    // Try to get an item that does not exist in the pool.
+    // Test exception for non-existing item with ID 17.
     std::string errorMsg;
     try {
-        lfuCache.getItem( 11 );
+        lfuCache.getItem( 17 );
     } catch( std::exception const& e ) {
         errorMsg = e.what();
     }
-    assert( errorMsg == "Not found item with ID 11 in the pool!" );
+    assert( errorMsg == "Not found item with ID 17 in the pool!" );
 
     // Check cache hits and evictions.
     assert( lfuCache.getCacheHits() == 5 );
