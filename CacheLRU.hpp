@@ -120,7 +120,7 @@ CacheLRU<KeyType, MapType>::addItemToCache  ( item_type &item )
     #endif
     this->_cache[ itemID ] = &item;
     _cacheOrder.push_back( &item );
-    _itemPositions.insert( { item.getID(), std::prev( _cacheOrder.end() ) } );
+    _itemPositions[ item.getID() ] = std::prev( _cacheOrder.end() );
 }
 
 template< typename KeyType, template <typename... Args> class MapType >
