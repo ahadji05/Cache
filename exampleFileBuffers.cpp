@@ -41,6 +41,7 @@
 #include "CacheLFU.hpp"
 #include "CacheFIFO.hpp"
 #include <chrono>
+#include <cassert>
 
 // Custom item that loads and unloads a buffer from a file-stream.
 class FileBuffer : public Item< size_t > {
@@ -123,27 +124,27 @@ void setup( const std::string& filename, size_t totalBuffers, size_t bufferSizeI
         throw std::runtime_error( "Failed to create test file: " + filename );
 
     for ( size_t i = 0; i < totalBuffers; ++i ) {
-        std::vector<char> buffer( bufferSizeInBytes, static_cast<char>( i % 256 ) ); // Fill buffer with sample data.
+        int value = i % 100;
+        std::vector<char> buffer( bufferSizeInBytes, static_cast<char>( value ) );
         outFile.write( buffer.data(), bufferSizeInBytes );
     }
     outFile.close();
 }
 
+// Example parameters.
+const std::string filename = "data.bin";
+const size_t      bufferSizeInBytes = 1000;    // Size of each buffer.
+const size_t      totalBuffers      = 5000000; // Total number of buffers in the file.
+const size_t      cacheCapacity     = 200000;  // Capacity of the Cache (number of buffers).
 
 int main() {
 
     try {
-        // Setup test file.
-        // setup( "data.bin", 10000000, 1000 );
-        // return 0;
-
-        const std::string filename = "data.bin";
-        const size_t      bufferSizeInBytes = 1000;     // Size of each buffer.
-        const size_t      totalBuffers      = 10000000; // Total number of buffers in the file.
-        const size_t      cacheCapacity     = 200000;   // Capacity of the Cache (number of buffers).
+        // Setup test file; roughly 5 GB file with 5 million buffers, each one of size 1000 bytes.
+        setup( filename, totalBuffers, bufferSizeInBytes );
 
         // Create a Pool of FileBuffer items using size_t as KeyType.
-        Pool< size_t > fileBufferPool;
+        Pool< size_t, std::unordered_map > fileBufferPool;
 
         for ( size_t i = 0; i < totalBuffers; ++i ) {
             size_t offset = i * bufferSizeInBytes;
@@ -151,19 +152,23 @@ int main() {
         }
 
         // Create a Cache on top of the Pool with the same KeyType == size_t.
-        CacheLFU< size_t > fileBufferCache( &fileBufferPool, cacheCapacity );
+        CacheLRU< size_t, std::unordered_map > fileBufferCache( &fileBufferPool, cacheCapacity );
+
+        // Use current time as seed for random generator.
+        std::srand( std::time( {} ) );
 
         // Access and process buffers using the Cache.
         std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
-        for ( size_t i = 0; i < 1000000; ++i ) {
+        for ( size_t i = 0; i < 300000; ++i ) {
 
-            size_t id = random() % totalBuffers; // Randomly access buffers.
-    
+            // Randomly access buffers.
+            size_t id = std::rand() % totalBuffers;
+
             const char * bufferData = dynamic_cast< FileBuffer* >( fileBufferCache.getItem( id ) )->getBuffer();
 
-            // Process the buffer data (for demonstration, we just print the first byte).
-            // if ( bufferData )
-            //     std::cout << "Buffer " << i << " first byte: " << static_cast<int>( bufferData[ 0 ] ) << std::endl;
+            // For testing purposes, we assert that the first byte of the buffer matches the expected value.
+            // The expected value is (id % 100) as per the setup function.
+            assert( static_cast<int>( bufferData[ 0 ] ) == ( id % 100 ) );
         }
         std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> time = end - begin ;

@@ -5,7 +5,7 @@ tests.exe: tests.cpp
 	g++ -g -std=c++14 $? -o $@ -DDEBUG_CACHES
 
 exampleFileBuffers.exe: exampleFileBuffers.cpp
-	g++ -g -Ofast -std=c++14 $? -o $@ 
+	g++ -Ofast -std=c++14 $? -o $@ 
 
 clean:
 	rm tests.exe exampleFileBuffers.exe
