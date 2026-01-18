@@ -24,16 +24,16 @@ The architecture separates **storage management** (Pool) from **caching policy**
 
 ✨ **Generic Design**: Works with any Key type (integers, strings, custom types) and any Map type (`std::map`, `std::unordered_map`, or custom implementations)
 
-🎯 **Multiple Eviction Policies**: Choose the caching strategy that best fits your use case
+**Multiple Eviction Policies**: Choose the caching strategy that best fits your use case
 - **LRU** (Least Recently Used): Best for temporal locality patterns
 - **LFU** (Least Frequently Used): Best for frequency-based access patterns  
 - **FIFO** (First In First Out): Simple and predictable eviction
 
-🔌 **Extensible**: Create custom Item types by implementing just two methods: `load()` and `unload()`
+**Extensible**: Create custom Item types by implementing just two methods: `load()` and `unload()`
 
-⚡ **Header-Only**: Easy integration into your projects
+**Header-Only**: Easy integration into your projects
 
-🎨 **Template-Based**: Zero-cost abstractions with compile-time polymorphism
+**Template-Based**: Zero-cost abstractions with compile-time polymorphism
 
 ## Implemented Cache Algorithms
 
@@ -133,7 +133,7 @@ public:
     void load() override {
         if (m_loaded) return;  // Already loaded
         
-        std::cout << "📥 Executing query: " << m_query << std::endl;
+        std::cout << "Executing query: " << m_query << std::endl;
         
         // Actually fetch data from the simulated data source
         // This demonstrates loading data from "somewhere" (simulated DB)
@@ -147,7 +147,7 @@ public:
     void unload() override {
         if (!m_loaded) return;  // Already unloaded
         
-        std::cout << "📤 Unloading query results: " << m_query << std::endl;
+        std::cout << "Unloading query results: " << m_query << std::endl;
         m_data.clear();  // Free memory
         m_loaded = false;
     }
@@ -284,14 +284,14 @@ public:
 
     void load() override {
         if (m_loaded) return;
-        std::cout << "📥 Loading: " << m_query << std::endl;
+        std::cout << "Loading: " << m_query << std::endl;
         m_data = {"Row1", "Row2", "Row3"};  // Simulate query execution
         m_loaded = true;
     }
 
     void unload() override {
         if (!m_loaded) return;
-        std::cout << "📤 Unloading: " << m_query << std::endl;
+        std::cout << "Unloading: " << m_query << std::endl;
         m_data.clear();
         m_loaded = false;
     }
@@ -329,16 +329,16 @@ int main() {
 **Expected Output:**
 ```
 === Accessing 3 queries with cache size 2 ===
-📥 Loading: SELECT * FROM users
-📥 Loading: SELECT * FROM products
-📤 Unloading: SELECT * FROM users
-📥 Loading: SELECT * FROM orders
+Loading: SELECT * FROM users
+Loading: SELECT * FROM products
+Unloading: SELECT * FROM users
+Loading: SELECT * FROM orders
 
 === Re-accessing first query ===
-📤 Unloading: SELECT * FROM products
-📥 Loading: SELECT * FROM users
+Unloading: SELECT * FROM products
+Loading: SELECT * FROM users
 
-📊 Cache Statistics:
+Cache Statistics:
    Hits: 0
    Evictions: 2
 ```
