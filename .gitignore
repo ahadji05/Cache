@@ -1,0 +1,8 @@
+# Build artifacts
+*.exe
+*.o
+*.out
+
+# Test data files
+*.bin
+data.bin
