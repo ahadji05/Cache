@@ -1,5 +1,5 @@
-# ItemCache
-A flexible, header-only C++ library providing **Pool-backed caches** with multiple eviction policies. This library is designed to be **generic with respect to Key-type and Map-type**, enabling efficient caching solutions for a wide range of applications.
+# Generic Pool-backed Cache implementations
+A flexible, header-only C++ library providing **Pool-backed caches** with multiple eviction policies. This library is designed to be **generic with respect to Key-type and Map-type**, and provides an interface that enables developing custom cachable objects.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -234,6 +234,9 @@ int main() {
     // Accessing the first query again will load it back
     result1 = queryCache.getItem("SELECT * FROM users");
     // "SELECT * FROM products" was evicted this time
+
+    // Accessing the same query again will hit the cache
+    result1 = queryCache.getItem("SELECT * FROM users");
     
     std::cout << "Cache hits: " << queryCache.getCacheHits() << "\n";
     std::cout << "Cache evictions: " << queryCache.getCacheEvictions() << "\n";
@@ -318,7 +321,7 @@ int main() {
     std::cout << "\n=== Re-accessing first query ===\n";
     cache.getItem("SELECT * FROM users");  // Will evict "products"
 
-    std::cout << "\n📊 Cache Statistics:\n";
+    std::cout << "\nCache Statistics:\n";
     std::cout << "   Hits: " << cache.getCacheHits() << "\n";
     std::cout << "   Evictions: " << cache.getCacheEvictions() << "\n";
 
