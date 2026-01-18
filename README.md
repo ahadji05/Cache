@@ -1,4 +1,4 @@
-# Generic Pool-backed Cache implementations
+# Generic Pool-backed Caches
 A flexible, header-only C++ library providing **Pool-backed caches** with multiple eviction policies. This library is designed to be **generic with respect to Key-type and Map-type**, and provides an interface that enables developing custom cachable objects.
 
 ## Table of Contents
