@@ -56,7 +56,7 @@ Pool<KeyType, MapType>::addItem( unique_ptr_type item )
     KeyType id = item->getID();
 
     if ( m_pool.count( id ) )
-        throw std::runtime_error( "The item with ID "+std::to_string(id)+" already exists in the pool!" );
+        throw std::runtime_error( "Item already exists in the pool!" );
 
     pair_type p = { id, std::move( item ) };
 

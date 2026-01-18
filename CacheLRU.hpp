@@ -80,7 +80,7 @@ CacheLRU<KeyType, MapType>::getItem( KeyType itemID )
     // search pool for the item.
     item = searchPool( itemID );
     if ( item == nullptr )
-        throw std::runtime_error( "Not found item with ID "+std::to_string( itemID )+" in the pool!" );
+        throw std::runtime_error( "Item not found in the pool!" );
 
     // load from the pool.
     loadItemFromPool( *item );
