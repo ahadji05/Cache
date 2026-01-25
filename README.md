@@ -6,7 +6,7 @@ A flexible, header-only C++ library providing **Pool-backed caches** with multip
 - [Key Features](#key-features)
 - [Implemented Cache Algorithms](#implemented-cache-algorithms)
 - [Core Concepts](#core-concepts)
-- [Getting Started: Creating a Custom Item](#getting-started-creating-a-custom-item)
+- [How to use this library?](#how-to-use-this-library)
 - [Switching Between Map Types](#switching-between-map-types)
 - [Building and Testing](#building-and-testing)
 - [License](#license)
