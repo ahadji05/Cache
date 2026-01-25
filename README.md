@@ -74,7 +74,7 @@ Abstract base class for cache implementations. Each cache:
 
 ## How to use this library?
 
-Let's demonstrate how to use this library using a pactical example: **caching database query results**. This is useful when you have expensive database queries that you want to cache in memory, in order to reduce the amount of times the database is accessed.
+Let's demonstrate how to use this library using a 4-steps example: **caching database query results**. This can be useful when you have expensive database queries that you want to cache in memory for faster future access.
 
 ### Step 1: Define Your Custom Item Class
 
