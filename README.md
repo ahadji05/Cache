@@ -74,7 +74,7 @@ Abstract base class for cache implementations. Each cache:
 
 ## How to use this library?
 
-Let's demonstrate how to use this library using a 4-steps example: **caching database query results**. This can be useful when you have expensive database queries that you want to cache in memory for faster future access.
+Let's demonstrate how to use this library using a 3-steps example: **caching database query results**. This can be useful when you have expensive database queries that you want to cache in memory for faster future access.
 
 ### Step 1: Define Your Custom Item Class
 
@@ -200,7 +200,7 @@ int main() {
 }
 ```
 
-### Step 3: Include the Cache with Your Preferred Policy
+### Step 3: Create the Cache with Your Preferred Policy
 
 ```cpp
 #include "CacheLRU.hpp"
@@ -244,7 +244,7 @@ int main() {
 }
 ```
 
-### Step 4: Understanding the Flow
+### Understanding the Flow:
 
 1. **First access** to `"SELECT * FROM users"`:
    - Cache misses → searches Pool → finds item
