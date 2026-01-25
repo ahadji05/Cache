@@ -200,7 +200,7 @@ int main() {
 }
 ```
 
-### Step 3: Create a Cache with Your Preferred Policy
+### Step 3: Include the Cache with Your Preferred Policy
 
 ```cpp
 #include "CacheLRU.hpp"
