@@ -13,10 +13,10 @@ A flexible, header-only C++ library providing **Pool-backed caches** with multip
 
 ## Overview
 
-This library provides a complete caching infrastructure where:
+This library provides the following caching infrastructure:
 - **Pool** manages the entire collection of items that can potentially be cached
 - **Cache** implementations (LRU, LFU, FIFO) maintain a subset of items from the Pool in memory
-- **Item** is the base class you extend to create custom cacheable objects with `load()` and `unload()` logic
+- **Item** is the base class you extend to create custom cacheable objects with `load()` and `unload()` logic. When an item is loaded it means it is in the cache, otherwise not.
 
 The architecture separates **storage management** (Pool) from **caching policy** (Cache implementations), allowing you to focus on defining what it means to load/unload your specific data.
 
@@ -24,16 +24,14 @@ The architecture separates **storage management** (Pool) from **caching policy**
 
 ✨ **Generic Design**: Works with any Key type (integers, strings, custom types) and any Map type (`std::map`, `std::unordered_map`, or custom implementations)
 
-**Multiple Eviction Policies**: Choose the caching strategy that best fits your use case
-- **LRU** (Least Recently Used): Best for temporal locality patterns
-- **LFU** (Least Frequently Used): Best for frequency-based access patterns  
-- **FIFO** (First In First Out): Simple and predictable eviction
+**Eviction Policies**:
+- **LRU** (Least Recently Used)
+- **LFU** (Least Frequently Used)
+- **FIFO** (First In First Out)
 
-**Extensible**: Create custom Item types by implementing just two methods: `load()` and `unload()`
+**Extensible**: Create custom Item-types by implementing the two methods: `load()` and `unload()`.
 
-**Header-Only**: Easy integration into your projects
-
-**Template-Based**: Zero-cost abstractions with compile-time polymorphism
+**Header-Only**: Easy integration into other projects.
 
 ## Implemented Cache Algorithms
 
@@ -57,25 +55,26 @@ virtual void unload() = 0;  // Unload item from memory/cache
 
 ### 2. Pool (Pool.hpp)
 A container that holds **all** available items (both cached and uncached). The Pool:
-- Stores items as `unique_ptr` (owns the items)
-- Provides fast lookup by Key
-- Is generic over KeyType and MapType
+- Stores items as `unique_ptr` (owns the items).
+- Provides fast lookup by Key.
+- Is generic over KeyType and MapType.
 
 ### 3. Cache (Cache.hpp)
 Abstract base class for cache implementations. Each cache:
-- Maintains a **non-owning** pointer to a Pool
-- Keeps a subset of Pool items in the cache
-- Implements a specific eviction policy
-- Tracks cache hits and evictions
+- Maintains a **non-owning** pointer to a Pool.
+- Has a specific capacity.
+- Chooses which items from the Pool are loaded or unloaded based on the maximum cache-capacity.
+- Implements a specific eviction policy.
+- Tracks cache hits and evictions.
 
 ### 4. Cache Implementations
-- **CacheLRU**: Uses a list to track access order, moving items to the back on access
-- **CacheLFU**: Uses frequency maps to track access counts, evicting least frequent items
-- **CacheFIFO**: Uses a deque to track insertion order, evicting oldest items
+- **CacheLRU**: Uses a list to track access order, moving items to the back on access.
+- **CacheLFU**: Uses frequency maps to track access counts, evicting least frequent items.
+- **CacheFIFO**: Uses a deque to track insertion order, evicting oldest items.
 
-## Getting Started: Creating a Custom Item
+## How to use this library?
 
-Let's create a practical example: **caching database query results**. This is useful when you have expensive database queries that you want to cache in memory.
+Let's demonstrate how to use this library using a pactical example: **caching database query results**. This is useful when you have expensive database queries that you want to cache in memory, in order to reduce the amount of times the database is accessed.
 
 ### Step 1: Define Your Custom Item Class
 
