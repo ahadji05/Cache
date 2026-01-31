@@ -81,11 +81,13 @@ Let's demonstrate how to use this library using a 3-steps example: **caching dat
 Create a class that inherits from `Item<KeyType>` and implements `load()` and `unload()`:
 
 ```cpp
-#include "Item.hpp"
+#include "kash/Item.hpp"
 #include <string>
 #include <vector>
 #include <thread>
 #include <chrono>
+
+using namespace kash;
 
 // Represents a database query result that can be cached
 class QueryResult : public Item<std::string> {
@@ -179,8 +181,10 @@ public:
 ### Step 2: Create a Pool and Add Items
 
 ```cpp
-#include "Pool.hpp"
+#include "kash/Pool.hpp"
 #include <memory>
+
+using namespace kash;
 
 int main() {
     // Create a Pool to hold all possible query results
@@ -203,9 +207,11 @@ int main() {
 ### Step 3: Create the Cache with Your Preferred Policy
 
 ```cpp
-#include "CacheLRU.hpp"
-// or #include "CacheLFU.hpp"
-// or #include "CacheFIFO.hpp"
+#include "kash/CacheLRU.hpp"
+// or #include "kash/CacheLFU.hpp"
+// or #include "kash/CacheFIFO.hpp"
+
+using namespace kash;
 
 int main() {
     // ... (Pool creation from Step 2)
@@ -266,12 +272,14 @@ int main() {
 Here's a full program you can compile and run:
 
 ```cpp
-#include "Item.hpp"
-#include "Pool.hpp"
-#include "CacheLRU.hpp"
+#include "kash/Item.hpp"
+#include "kash/Pool.hpp"
+#include "kash/CacheLRU.hpp"
 #include <iostream>
 #include <vector>
 #include <string>
+
+using namespace kash;
 
 class QueryResult : public Item<std::string> {
 private:
@@ -367,8 +375,8 @@ CacheLRU<int, std::map> cache(&pool, 100);
 ```cpp
 #include <unordered_map>
 
-Pool<int, std::unordered_map> pool;
-CacheLRU<int, std::unordered_map> cache(&pool, 100);
+kash::Pool<int, std::unordered_map> pool;
+kash::CacheLRU<int, std::unordered_map> cache(&pool, 100);
 ```
 
 **Characteristics:**
@@ -383,12 +391,12 @@ The beauty of this design is that switching between map types requires **only ch
 
 ```cpp
 // Original code using std::map
-Pool<std::string, std::map> pool;
-CacheLRU<std::string, std::map> cache(&pool, 50);
+kash::Pool<std::string, std::map> pool;
+kash::CacheLRU<std::string, std::map> cache(&pool, 50);
 
 // Switch to std::unordered_map by changing ONE word:
-Pool<std::string, std::unordered_map> pool;
-CacheLRU<std::string, std::unordered_map> cache(&pool, 50);
+kash::Pool<std::string, std::unordered_map> pool;
+kash::CacheLRU<std::string, std::unordered_map> cache(&pool, 50);
 ```
 
 No other code changes required! Your custom Item class works with both.
@@ -405,8 +413,8 @@ class MyCustomMap {
     // Your implementation with std::map-compatible interface
 };
 
-Pool<int, MyCustomMap> pool;
-CacheLRU<int, MyCustomMap> cache(&pool, 100);
+kash::Pool<int, MyCustomMap> pool;
+kash::CacheLRU<int, MyCustomMap> cache(&pool, 100);
 ```
 
 ## Building and Testing
@@ -414,8 +422,8 @@ CacheLRU<int, MyCustomMap> cache(&pool, 100);
 ### Compile the Tests
 
 ```bash
-make tests.exe
-./tests.exe
+make test
+./test
 ```
 
 This runs comprehensive tests for all three cache implementations (LRU, LFU, FIFO).
@@ -423,8 +431,8 @@ This runs comprehensive tests for all three cache implementations (LRU, LFU, FIF
 ### Compile the File Buffer Example
 
 ```bash
-make exampleFileBuffers.exe
-./exampleFileBuffers.exe
+make FileBuffers
+./FileBuffers
 ```
 
 This demonstrates caching file buffers loaded from disk - a practical example of using Pool-backed caches for I/O operations.
