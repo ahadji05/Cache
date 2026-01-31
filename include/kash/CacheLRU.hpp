@@ -25,6 +25,8 @@
 
 #include "Cache.hpp"
 
+namespace kash {
+
 template<
         typename KeyType = int64_t ,
         template <typename... Args> typename MapType = std::map
@@ -186,3 +188,5 @@ CacheLRU<KeyType, MapType>::searchPool ( KeyType itemID )
 {
     return this->m_pool->getItem( itemID );
 }
+
+} // namespace kash

@@ -27,6 +27,8 @@
 #include <memory>
 #include <map>
 
+namespace kash {
+
 template<
         typename KeyType = int64_t ,
         template <typename... Args> class MapType = std::map
@@ -102,3 +104,5 @@ Pool<KeyType, MapType>::getItem( KeyType id ) const
     #endif
     return m_pool.at(id).get();
 }
+
+} // namespace kash

@@ -43,6 +43,8 @@
 #include <chrono>
 #include <cassert>
 
+using namespace kash;
+
 // Custom item that loads and unloads a buffer from a file-stream.
 class FileBuffer : public Item< size_t > {
 

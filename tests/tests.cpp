@@ -7,6 +7,8 @@
 #include <cassert>
 #include <chrono>
 
+using namespace kash;
+
 /*******************************************************************************
  * Main test program for Cache implementations.
  * Tests CacheLRU, CacheLFU, and CacheFIFO classes using a simple TestItem class.
@@ -205,7 +207,7 @@ int test_for_CacheLRU( Pool<key_type, map_type> const& pool, std::vector<int> co
     } catch( std::exception const& e ) {
         errorMsg = e.what();
     }
-    assert( errorMsg == "Not found item with ID 11 in the pool!" );
+    assert( errorMsg == "Item not found in the pool!" );
 
     return 0;
 }
@@ -344,7 +346,7 @@ int test_for_CacheLFU( Pool<key_type, map_type> const& pool, std::vector<int> co
     } catch( std::exception const& e ) {
         errorMsg = e.what();
     }
-    assert( errorMsg == "Not found item with ID 17 in the pool!" );
+    assert( errorMsg == "Item not found in the pool!" );
 
     // Check cache hits and evictions.
     assert( lfuCache.getCacheHits() == 5 );
@@ -439,7 +441,7 @@ int test_for_CacheFIFO( Pool<key_type, map_type> const& pool, std::vector<int> c
     } catch( std::exception const& e ) {
         errorMsg = e.what();
     }
-    assert( errorMsg == "Not found item with ID 11 in the pool!" );
+    assert( errorMsg == "Item not found in the pool!" );
 
     // Check cache hits and evictions.
     assert( fifoCache.getCacheHits() == 1 );

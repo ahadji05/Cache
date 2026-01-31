@@ -31,6 +31,8 @@
 #include <list>
 #include <map>
 
+namespace kash {
+
 template< typename KeyType >
 class Item {
 
@@ -73,3 +75,5 @@ Item<KeyType>::getID() const
 {
     return m_itemID;
 }
+
+} // namespace kash

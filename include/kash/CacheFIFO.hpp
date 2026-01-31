@@ -26,6 +26,8 @@
 #include "Cache.hpp"
 #include <deque>
 
+namespace kash {
+
 template<
         typename KeyType = int64_t ,
         template <typename... Args> typename MapType = std::map
@@ -178,3 +180,5 @@ CacheFIFO<KeyType, MapType>::searchPool ( KeyType itemID )
 {
     return this->m_pool->getItem( itemID );
 }
+
+} // namespace kash

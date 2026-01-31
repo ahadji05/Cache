@@ -25,6 +25,8 @@
 
 #include "Pool.hpp"
 
+namespace kash {
+
 template<
         typename KeyType = int64_t ,
         template <typename... Args> class MapType = std::map
@@ -103,3 +105,5 @@ Cache<KeyType, MapType>::getCacheEvictions() const
 {
     return _cacheEvictions;
 }
+
+} // namespace kash
