@@ -23,7 +23,7 @@
 */
 #pragma once
 
-#include "Cache.hpp"
+#include "kash/Cache.hpp"
 #include <deque>
 
 namespace kash {

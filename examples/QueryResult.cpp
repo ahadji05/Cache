@@ -1,4 +1,7 @@
-#include "Item.hpp"
+#include "kash/Item.hpp"
+#include "kash/CacheLRU.hpp"
+#include "kash/Pool.hpp"
+
 #include <string>
 #include <vector>
 #include <thread>
@@ -87,8 +90,6 @@ public:
     }
 };
 
-#include "CacheLRU.hpp"
-#include "Pool.hpp"
 
 int main() {
 

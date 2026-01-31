@@ -35,11 +35,11 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "Item.hpp"
-#include "Pool.hpp"
-#include "CacheLRU.hpp"
-#include "CacheLFU.hpp"
-#include "CacheFIFO.hpp"
+#include "kash/Item.hpp"
+#include "kash/Pool.hpp"
+#include "kash/CacheLRU.hpp"
+#include "kash/CacheLFU.hpp"
+#include "kash/CacheFIFO.hpp"
 #include <chrono>
 #include <cassert>
 

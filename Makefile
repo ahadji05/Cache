@@ -1,14 +1,14 @@
 
-all:  tests.exe exampleFileBuffers.exe QueryResult.exe
+all:  test fileBuffers queryResult
 
-tests.exe: tests/tests.cpp
-	g++ -g -std=c++14 $? -o $@ -DDEBUG_CACHES -I./include/kash
+test: tests/tests.cpp
+	g++ -g -std=c++14 $? -o $@ -DDEBUG_CACHES -I./include
 
-exampleFileBuffers.exe: examples/exampleFileBuffers.cpp
-	g++ -Ofast -std=c++14 $? -o $@ -I./include/kash
+fileBuffers: examples/FileBuffers.cpp
+	g++ -Ofast -std=c++14 $? -o $@ -I./include
 
-QueryResult.exe: examples/QueryResult.cpp
-	g++ -Ofast -std=c++14 $? -o $@ -I./include/kash
+queryResult: examples/QueryResult.cpp
+	g++ -Ofast -std=c++14 $? -o $@ -I./include
 
 clean:
-	rm tests.exe exampleFileBuffers.exe QueryResult.exe *.bin
+	rm test fileBuffers queryResult *.bin

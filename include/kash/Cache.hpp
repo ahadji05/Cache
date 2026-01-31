@@ -23,7 +23,7 @@
 */
 #pragma once
 
-#include "Pool.hpp"
+#include "kash/Pool.hpp"
 
 namespace kash {
 

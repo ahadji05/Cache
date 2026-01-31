@@ -1,9 +1,9 @@
 
-#include "CacheFIFO.hpp"
-#include "CacheLRU.hpp"
-#include "CacheLFU.hpp"
-#include "Pool.hpp"
-#include "Item.hpp"
+#include "kash/CacheFIFO.hpp"
+#include "kash/CacheLRU.hpp"
+#include "kash/CacheLFU.hpp"
+#include "kash/Pool.hpp"
+#include "kash/Item.hpp"
 #include <cassert>
 #include <chrono>
 
