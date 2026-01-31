@@ -360,8 +360,8 @@ One of the most powerful features of this library is the ability to easily switc
 ### Using std::map (Ordered Map)
 
 ```cpp
-Pool<int, std::map> pool;
-CacheLRU<int, std::map> cache(&pool, 100);
+kash::Pool<int, std::map> pool;
+kash::CacheLRU<int, std::map> cache(&pool, 100);
 ```
 
 **Characteristics:**
