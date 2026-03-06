@@ -22,7 +22,7 @@ The architecture separates **storage management** (Pool) from **caching policy**
 
 ## Key Features
 
-✨ **Generic Design**: Works with any Key type (integers, strings, custom types) and any Map type (`std::map`, `std::unordered_map`, or custom implementations)
+**Generic Design**: Works with any Key type (integers, strings, custom types) and any Map type (`std::map`, `std::unordered_map`, or custom implementations)
 
 **Eviction Policies**:
 - **LRU** (Least Recently Used)
